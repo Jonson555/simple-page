@@ -1,143 +1,16 @@
-<?php
-function ValidateEmail($email)
-{
-   $pattern = '/^([0-9a-z]([-.\w]*[0-9a-z])*@(([0-9a-z])+([-\w]*[0-9a-z])*\.)+[a-z]{2,6})$/i';
-   return preg_match($pattern, $email);
-}
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['formid']) && $_POST['formid'] == 'form1')
-{
-   $mailto = 'gostiuandrei7@gmail.com';
-   $mailfrom = isset($_POST['email']) ? $_POST['email'] : $mailto;
-   $subject = 'Заявка с сайта';
-   $message = 'Values submitted from web site form:';
-   $success_url = './uspeh.php';
-   $error_url = '';
-   $eol = "\n";
-   $error = '';
-   $internalfields = array ("submit", "reset", "send", "filesize", "formid", "captcha", "recaptcha_challenge_field", "recaptcha_response_field", "g-recaptcha-response", "h-captcha-response");
-   $boundary = md5(uniqid(time()));
-   $header  = 'From: '.$mailfrom.$eol;
-   $header .= 'Reply-To: '.$mailfrom.$eol;
-   $header .= 'MIME-Version: 1.0'.$eol;
-   $header .= 'Content-Type: multipart/mixed; boundary="'.$boundary.'"'.$eol;
-   $header .= 'X-Mailer: PHP v'.phpversion().$eol;
-   try
-   {
-      if (!ValidateEmail($mailfrom))
-      {
-         $error .= "The specified email address (" . $mailfrom . ") is invalid!\n<br>";
-         throw new Exception($error);
-      }
-      $message .= $eol;
-      $message .= "IP Address : ";
-      $message .= $_SERVER['REMOTE_ADDR'];
-      $message .= $eol;
-      foreach ($_POST as $key => $value)
-      {
-         if (!in_array(strtolower($key), $internalfields))
-         {
-            if (is_array($value))
-            {
-               $message .= ucwords(str_replace("_", " ", $key)) . " : " . implode(",", $value) . $eol;
-            }
-            else
-            {
-               $message .= ucwords(str_replace("_", " ", $key)) . " : " . $value . $eol;
-            }
-         }
-      }
-      $body  = 'This is a multi-part message in MIME format.'.$eol.$eol;
-      $body .= '--'.$boundary.$eol;
-      $body .= 'Content-Type: text/plain; charset=UTF-8'.$eol;
-      $body .= 'Content-Transfer-Encoding: 8bit'.$eol;
-      $body .= $eol.stripslashes($message).$eol;
-      if (!empty($_FILES))
-      {
-         foreach ($_FILES as $key => $value)
-         {
-             if ($_FILES[$key]['error'] == 0)
-             {
-                $body .= '--'.$boundary.$eol;
-                $body .= 'Content-Type: '.$_FILES[$key]['type'].'; name='.$_FILES[$key]['name'].$eol;
-                $body .= 'Content-Transfer-Encoding: base64'.$eol;
-                $body .= 'Content-Disposition: attachment; filename='.$_FILES[$key]['name'].$eol;
-                $body .= $eol.chunk_split(base64_encode(file_get_contents($_FILES[$key]['tmp_name']))).$eol;
-             }
-         }
-      }
-      $body .= '--'.$boundary.'--'.$eol;
-      if ($mailto != '')
-      {
-         mail($mailto, $subject, $body, $header);
-      }
-      header('Location: '.$success_url);
-   }
-   catch (Exception $e)
-   {
-      $errorcode = file_get_contents($error_url);
-      $replace = "##error##";
-      $errorcode = str_replace($replace, $e->getMessage(), $errorcode);
-      echo $errorcode;
-   }
-   exit;
-}
-?>
 <!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>Новая Мебель</title>
+<title>Nova Mebel</title>
 <meta name="generator" content="WYSIWYG Web Builder 17 - https://www.wysiwygwebbuilder.com">
-<link href="DSC01468_обработано.png" rel="icon" sizes="6016x4016" type="image/png">
-<link href="css/Безымянный3.css" rel="stylesheet">
+<link href="css/Безымянный1.css" rel="stylesheet">
 <link href="css/index.css" rel="stylesheet">
-<script src="jquery-3.6.0.min.js"></script>
-<script src="searchindex.js"></script>
-<script src="wb.sitesearch.min.js"></script>
-<script>   
-   var features = 'toolbar=no,menubar=no,location=no,scrollbars=yes,resizable=yes,status=no,left=,top=,width=,height=';
-   function searchPage(features)
-   {
-      var element = document.getElementById('SiteSearch1');
-      window.open('sitesearch1-results.html?q='+encodeURIComponent(element.value), '', features);
-      return false;
-   }
-</script>
-<script>   
-   $(document).ready(function()
-   {
-      searchParseURL('SiteSearch1');
-   });
-</script>
 </head>
 <body>
-   <div id="Layer1" style="position:absolute;text-align:left;left:0%;top:0px;width:100%;height:1000px;z-index:13;">
-      <div id="wb_Image1" style="position:absolute;left:21px;top:18px;width:144px;height:108px;z-index:3;">
-         <img src="images/Screenshot_1 — копия.jpg" id="Image1" alt="" width="144" height="108"></div>
-      <div id="wb_Text1" style="position:absolute;left:274px;top:47px;width:145px;height:18px;text-align:center;z-index:4;">
-         <span style="background-color:#F5F5F5;color:#FF0000;font-family:Arial;font-size:16px;">8 (800)345-56-43</span></div>
-      <div id="wb_TextMenu1" style="position:absolute;left:434px;top:35px;width:200px;height:404px;z-index:5;">
-         <span><a href="" class="style1">Item 1</a></span>
-         <span><a href="" class="style1">Item 2</a></span>
-         <span><a href="" class="style1">Item 3</a></span>
-         <span><a href="" class="style1">Item 4</a></span>
-      </div>
-      <div id="wb_Shape1" style="position:absolute;left:55px;top:187px;width:268px;height:307px;opacity:0.60;z-index:6;">
-         <img src="images/img0001.png" id="Shape1" alt="" width="268" height="307" style="width:268px;height:307px;"></div>
-      <div id="wb_Text2" style="position:absolute;left:55px;top:207px;width:281px;height:27px;z-index:7;">
-         <span style="color:#000000;font-family:Arial;font-size:24px;">Оставьте ваши данные</span></div>
-      <form name="SiteSearch1_form" id="SiteSearch1_form" role="search" accept-charset="UTF-8" onsubmit="return searchPage(features)">
-         <input type="text" id="SiteSearch1" style="position:absolute;left:406px;top:116px;width:140px;height:16px;z-index:8;" name="SiteSearch1" value="" spellcheck="false" placeholder="Search this website" role="searchbox"></form>
-      <div id="wb_Form1" style="position:absolute;left:69px;top:243px;width:241px;height:237px;z-index:9;">
-         <form name="Form1" method="post" action="<?php echo basename(__FILE__); ?>" enctype="multipart/form-data" id="Form1">
-            <input type="hidden" name="formid" value="form1">
-            <input type="text" id="Editbox1" style="position:absolute;left:20px;top:22px;width:191px;height:32px;z-index:0;" name="Имя" value="" spellcheck="false" placeholder="Введите имя">
-            <input type="tel" id="Editbox2" style="position:absolute;left:20px;top:93px;width:191px;height:32px;z-index:1;" name="Телефон" value="" spellcheck="false" placeholder="Ваш телефон">
-            <a id="Button2" href="" style="position:absolute;left:20px;top:165px;width:201px;height:31px;z-index:2;">Отправить</a>
-         </form>
-      </div>
-   </div>
-   <a href="https://www.wysiwygwebbuilder.com" target="_blank"><img src="images/builtwithwwb17.png" alt="WYSIWYG Web Builder" style="position:absolute;left:628px;top:1144px;margin:0;border-width:0;z-index:250" width="16" height="16"></a>
-   <input type="button" id="Button1" onclick="searchPage();return false;" name="Search" value="Search" style="position:absolute;left:560px;top:116px;width:96px;height:25px;z-index:15;">
+   <input type="submit" id="Button1" name="" value="Submit" style="position:absolute;left:483px;top:253px;width:197px;height:49px;z-index:0;">
+   <input type="submit" id="Button2" name="" value="Submit" style="position:absolute;left:269px;top:189px;width:197px;height:49px;z-index:1;">
+   <a href="https://www.wysiwygwebbuilder.com" target="_blank"><img src="images/builtwithwwb17.png" alt="WYSIWYG Web Builder" style="position:absolute;left:441px;top:967px;margin:0;border-width:0;z-index:250" width="16" height="16"></a>
+   <input type="submit" id="Button3" name="" value="Submit" style="position:absolute;left:734px;top:158px;width:197px;height:49px;z-index:3;">
 </body>
 </html>
